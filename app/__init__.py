@@ -1,12 +1,16 @@
 import logging
 import os
 import shutil
+import threading
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask, render_template
 from config import get_config
 from app.extensions import db, login_manager, migrate, csrf
+
+_seed_lock = threading.Lock()
+_seeded = False
 
 
 def create_app(config_name=None):
@@ -19,6 +23,7 @@ def create_app(config_name=None):
     _register_error_handlers(app)
     _register_cli(app)
     _register_context_processors(app)
+    _register_first_request_hook(app)
 
     with app.app_context():
         try:
@@ -31,7 +36,6 @@ def create_app(config_name=None):
             pass
         if app.config.get("AUTO_BACKUP_ON_STARTUP"):
             _auto_backup(app)
-        _auto_seed(app)
 
     return app
 
@@ -131,6 +135,20 @@ def _register_cli(app):
         """Copy the current SQLite database file into the backups/ directory."""
         _auto_backup(app)
         print("Backup complete.")
+
+
+def _register_first_request_hook(app):
+    """Seed the DB on the very first request, safely across multiple workers."""
+    @app.before_request
+    def seed_on_first_request():
+        global _seeded
+        if _seeded:
+            return
+        with _seed_lock:
+            if _seeded:
+                return
+            _auto_seed(app)
+            _seeded = True
 
 
 def _auto_seed(app):
