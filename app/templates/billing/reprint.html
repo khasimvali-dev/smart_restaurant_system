@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Reprint Bill{% endblock %}
+{% block header_title %}Reprint a Bill{% endblock %}
+{% block content %}
+<div class="card-panel" style="max-width:420px;">
+  <form method="GET">
+    <label class="form-label">Bill Number</label>
+    <div class="d-flex gap-2">
+      <input type="text" name="bill_number" class="form-control" placeholder="e.g. BILL-20260101-0001" required>
+      <button class="btn btn-primary">Find</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

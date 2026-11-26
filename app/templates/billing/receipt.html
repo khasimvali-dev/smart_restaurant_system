@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Receipt {{ bill.bill_number }}{% endblock %}
+{% block header_title %}Receipt{% endblock %}
+{% block content %}
+
+<div class="no-print d-flex justify-content-between mb-3" style="max-width:380px; margin-inline:auto;">
+  <a href="{{ url_for('billing.pos') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> New bill</a>
+  <button onclick="window.print()" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Print</button>
+</div>
+
+<div class="receipt-paper">
+  <h4>{{ restaurant_name }}</h4>
+  <p class="text-center text-muted mb-1" style="font-size:11.5px;">{{ config.RESTAURANT_ADDRESS }}</p>
+  <p class="text-center text-muted" style="font-size:11.5px;">GSTIN: {{ config.RESTAURANT_GSTIN }}</p>
+
+  <div class="receipt-divider"></div>
+  <div class="d-flex justify-content-between"><span>Bill No:</span><span>{{ bill.bill_number }}</span></div>
+  <div class="d-flex justify-content-between"><span>Date:</span><span>{{ bill.bill_date.strftime('%d-%m-%Y %H:%M') }}</span></div>
+  <div class="d-flex justify-content-between"><span>Cashier:</span><span>{{ bill.cashier.full_name }}</span></div>
+  {% if bill.customer %}
+  <div class="d-flex justify-content-between"><span>Customer:</span><span>{{ bill.customer.name }}</span></div>
+  {% endif %}
+  <div class="receipt-divider"></div>
+
+  {% for line in bill.line_items %}
+  <div class="d-flex justify-content-between">
+    <span>{{ line.item_name_snapshot }} x{{ line.quantity }}</span>
+    <span>{{ currency_symbol }}{{ "%.2f"|format(line.line_total) }}</span>
+  </div>
+  {% endfor %}
+
+  <div class="receipt-divider"></div>
+  <div class="d-flex justify-content-between"><span>Subtotal</span><span>{{ currency_symbol }}{{ "%.2f"|format(bill.subtotal) }}</span></div>
+  <div class="d-flex justify-content-between"><span>Discount</span><span>-{{ currency_symbol }}{{ "%.2f"|format(bill.discount_amount) }}</span></div>
+  <div class="d-flex justify-content-between"><span>GST / Tax</span><span>{{ currency_symbol }}{{ "%.2f"|format(bill.tax_amount) }}</span></div>
+  <div class="receipt-divider"></div>
+  <div class="d-flex justify-content-between" style="font-weight:700; font-size:15px;">
+    <span>GRAND TOTAL</span><span>{{ currency_symbol }}{{ "%.2f"|format(bill.grand_total) }}</span>
+  </div>
+  <div class="d-flex justify-content-between text-muted" style="font-size:11.5px;">
+    <span>Payment mode</span><span>{{ bill.payment_mode|upper }}</span>
+  </div>
+
+  <div class="text-center mt-3">
+    <img src="{{ qr_data_uri }}" alt="Bill QR code" width="90" height="90">
+    <p class="text-muted mt-1" style="font-size:10.5px;">Scan to verify this bill</p>
+  </div>
+
+  <p class="text-center text-muted mt-2" style="font-size:11px;">Thank you for dining with us!</p>
+</div>
+{% endblock %}

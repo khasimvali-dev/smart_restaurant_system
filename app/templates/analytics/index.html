@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block header_title %}Data Analytics Dashboard{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<form method="GET" class="d-flex gap-2 mb-3 flex-wrap">
+  <select name="granularity" class="form-select" style="width:160px">
+    <option value="daily" {{ 'selected' if granularity == 'daily' }}>Daily Trend</option>
+    <option value="weekly" {{ 'selected' if granularity == 'weekly' }}>Weekly Trend</option>
+    <option value="monthly" {{ 'selected' if granularity == 'monthly' }}>Monthly Trend</option>
+    <option value="yearly" {{ 'selected' if granularity == 'yearly' }}>Yearly Trend</option>
+  </select>
+  <input type="date" name="date_from" class="form-control" style="width:170px" value="{{ filters.get('date_from','') }}">
+  <input type="date" name="date_to" class="form-control" style="width:170px" value="{{ filters.get('date_to','') }}">
+  <button class="btn btn-primary">Apply Filters</button>
+</form>
+
+<div class="row g-3 mb-2">
+  <div class="col-4"><div class="kpi-tile"><div class="kpi-label">Total Revenue (period)</div><div class="kpi-value">{{ currency_symbol }}{{ "%.2f"|format(trend_summary.get('total', 0)) }}</div></div></div>
+  <div class="col-4"><div class="kpi-tile"><div class="kpi-label">Bills (period)</div><div class="kpi-value">{{ trend_summary.get('count', 0) }}</div></div></div>
+  <div class="col-4"><div class="kpi-tile"><div class="kpi-label">Average Bill Value</div><div class="kpi-value">{{ currency_symbol }}{{ "%.2f"|format(avg_bill) }}</div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card-panel">{{ trend_chart | safe }}</div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card-panel">{{ category_chart | safe }}</div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-lg-7">
+    <div class="card-panel">{{ top_items_chart | safe }}</div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card-panel">{{ heatmap_chart | safe }}</div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-lg-6">
+    <div class="section-heading">Least Sold Items</div>
+    <div class="card-panel">
+      {% for item in least_items %}
+        <div class="d-flex justify-content-between py-2 {{ 'border-bottom' if not loop.last }}">
+          <span>{{ item.item_name }}</span><span class="text-muted">{{ item.units_sold }} sold</span>
+        </div>
+      {% else %}<p class="text-muted mb-0">Not enough data yet.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="section-heading">Frequent Customers</div>
+    <div class="card-panel">
+      {% for c in frequent_customers %}
+        <div class="d-flex justify-content-between py-2 {{ 'border-bottom' if not loop.last }}">
+          <span>{{ c.name }}</span><span class="text-muted">{{ currency_symbol }}{{ "%.2f"|format(c.total_spend) }}</span>
+        </div>
+      {% else %}<p class="text-muted mb-0">No customer data yet.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

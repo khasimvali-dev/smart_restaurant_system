@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ customer.name }}{% endblock %}
+{% block header_title %}Customer: {{ customer.name }}{% endblock %}
+{% block content %}
+
+<div class="row g-3 mb-3">
+  <div class="col-4"><div class="kpi-tile"><div class="kpi-label">Total Spend</div><div class="kpi-value">{{ currency_symbol }}{{ "%.2f"|format(customer.total_spend) }}</div></div></div>
+  <div class="col-4"><div class="kpi-tile"><div class="kpi-label">Loyalty Points</div><div class="kpi-value">{{ customer.loyalty_points }}</div></div></div>
+  <div class="col-4"><div class="kpi-tile"><div class="kpi-label">Total Orders</div><div class="kpi-value">{{ bills|length }}</div></div></div>
+</div>
+
+<div class="section-heading">Purchase History</div>
+<div class="card-panel p-0">
+  <table class="table mb-0">
+    <thead><tr><th>Bill No</th><th>Date</th><th class="text-end">Total</th><th></th></tr></thead>
+    <tbody>
+    {% for bill in bills %}
+      <tr>
+        <td>{{ bill.bill_number }}</td>
+        <td>{{ bill.bill_date.strftime('%d %b %Y, %H:%M') }}</td>
+        <td class="text-end">{{ currency_symbol }}{{ "%.2f"|format(bill.grand_total) }}</td>
+        <td class="text-end"><a href="{{ url_for('billing.receipt', bill_id=bill.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="text-center text-muted py-4">No purchases yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

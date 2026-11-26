@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block guest_content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-mark">S</div>
+    <h2 class="mb-1">{{ restaurant_name }}</h2>
+    <p class="text-muted mb-4" style="font-size:14px;">Sign in to open the billing counter</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2">Sign in</button>
+    </form>
+
+    <p class="text-muted mt-4 mb-0" style="font-size:12.5px;">
+      Demo accounts (after <code>flask seed-db</code>): <br>
+      admin / Admin@123 &middot; cashier / Cashier@123
+    </p>
+  </div>
+</div>
+{% endblock %}
