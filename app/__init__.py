@@ -152,8 +152,9 @@ def _register_first_request_hook(app):
 
 
 def _auto_seed(app):
-    """Seed the database with demo data on first run (when users table is empty)."""
+    """Create all tables then seed with demo data if the DB is empty."""
     try:
+        db.create_all()
         from app.models.user import User
         if User.query.count() == 0:
             app.logger.info("Empty database detected — running auto-seed.")
