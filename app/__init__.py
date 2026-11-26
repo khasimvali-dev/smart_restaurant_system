@@ -25,6 +25,7 @@ def create_app(config_name=None):
         os.makedirs(app.config["BACKUP_DIR"], exist_ok=True)
         if app.config.get("AUTO_BACKUP_ON_STARTUP"):
             _auto_backup(app)
+        _auto_seed(app)
 
     return app
 
@@ -120,6 +121,19 @@ def _register_cli(app):
         """Copy the current SQLite database file into the backups/ directory."""
         _auto_backup(app)
         print("Backup complete.")
+
+
+def _auto_seed(app):
+    """Seed the database with demo data on first run (when users table is empty)."""
+    try:
+        from app.models.user import User
+        if User.query.count() == 0:
+            app.logger.info("Empty database detected — running auto-seed.")
+            from database.seed import run_seed
+            run_seed()
+            app.logger.info("Auto-seed complete.")
+    except Exception as e:
+        app.logger.warning("Auto-seed skipped: %s", e)
 
 
 def _auto_backup(app):
