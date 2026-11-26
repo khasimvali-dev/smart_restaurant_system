@@ -32,5 +32,6 @@ Pillow==10.4.0
 pytest==8.3.3
 pytest-flask==1.3.0
 
-# --- WSGI server for local "production" run ---
+# --- WSGI server (local: waitress, production/Render: gunicorn) ---
 waitress==3.0.0
+gunicorn==22.0.0

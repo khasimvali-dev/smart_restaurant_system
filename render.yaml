@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: smart-restaurant-system
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn "app:create_app('production')" --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: USE_SQLITE_FALLBACK
+        value: "true"
+      - key: RESTAURANT_NAME
+        value: Smart Restaurant & Cafe
+      - key: RESTAURANT_ADDRESS
+        value: 123 MG Road, Bengaluru, KA
+      - key: RESTAURANT_PHONE
+        value: "+91-9876543210"
+      - key: RESTAURANT_GSTIN
+        value: 29ABCDE1234F1Z5
+      - key: DEFAULT_GST_PERCENT
+        value: "5.0"
+      - key: CURRENCY_SYMBOL
+        value: "Rs."
+      - key: AUTO_BACKUP_ON_STARTUP
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
