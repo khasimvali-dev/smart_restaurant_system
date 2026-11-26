@@ -27,3 +27,9 @@ services:
         value: "false"
       - key: LOG_LEVEL
         value: INFO
+      - key: LOG_DIR
+        value: /tmp/logs
+      - key: EXPORT_DIR
+        value: /tmp/exports
+      - key: BACKUP_DIR
+        value: /tmp/backups

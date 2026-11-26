@@ -56,17 +56,17 @@ class Config:
     CURRENCY_SYMBOL = os.getenv("CURRENCY_SYMBOL", "Rs.")
 
     # --- Backups ---------------------------------------------------------
-    BACKUP_DIR = BASE_DIR / os.getenv("BACKUP_DIR", "backups")
+    BACKUP_DIR = Path(os.getenv("BACKUP_DIR", str(BASE_DIR / "backups")))
     AUTO_BACKUP_ON_STARTUP = _bool(os.getenv("AUTO_BACKUP_ON_STARTUP"), default=False)
 
     # --- Uploads / exports -------------------------------------------
-    EXPORT_DIR = BASE_DIR / "exports"
+    EXPORT_DIR = Path(os.getenv("EXPORT_DIR", str(BASE_DIR / "exports")))
 
     # --- Pagination -----------------------------------------------------
     ITEMS_PER_PAGE = 20
 
     # --- Logging ---------------------------------------------------------
-    LOG_DIR = BASE_DIR / "logs"
+    LOG_DIR = Path(os.getenv("LOG_DIR", str(BASE_DIR / "logs")))
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 

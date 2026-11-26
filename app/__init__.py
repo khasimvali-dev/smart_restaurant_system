@@ -21,8 +21,14 @@ def create_app(config_name=None):
     _register_context_processors(app)
 
     with app.app_context():
-        os.makedirs(app.config["EXPORT_DIR"], exist_ok=True)
-        os.makedirs(app.config["BACKUP_DIR"], exist_ok=True)
+        try:
+            os.makedirs(app.config["EXPORT_DIR"], exist_ok=True)
+        except OSError:
+            pass
+        try:
+            os.makedirs(app.config["BACKUP_DIR"], exist_ok=True)
+        except OSError:
+            pass
         if app.config.get("AUTO_BACKUP_ON_STARTUP"):
             _auto_backup(app)
         _auto_seed(app)
@@ -31,14 +37,18 @@ def create_app(config_name=None):
 
 
 def _init_logging(app):
-    os.makedirs(app.config["LOG_DIR"], exist_ok=True)
-    handler = RotatingFileHandler(
-        os.path.join(app.config["LOG_DIR"], "app.log"), maxBytes=1_000_000, backupCount=5
-    )
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-    )
-    app.logger.addHandler(handler)
+    try:
+        os.makedirs(app.config["LOG_DIR"], exist_ok=True)
+        handler = RotatingFileHandler(
+            os.path.join(app.config["LOG_DIR"], "app.log"), maxBytes=1_000_000, backupCount=5
+        )
+        handler.setFormatter(
+            logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+        )
+        app.logger.addHandler(handler)
+    except OSError:
+        # On read-only filesystems (e.g. Render free tier), fall back to stdout only
+        logging.basicConfig(format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     app.logger.setLevel(app.config.get("LOG_LEVEL", "INFO"))
 
 
