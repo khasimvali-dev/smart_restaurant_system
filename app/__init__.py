@@ -152,17 +152,20 @@ def _register_first_request_hook(app):
 
 
 def _auto_seed(app):
-    """Create all tables then seed with demo data if the DB is empty."""
+    """Create all tables then seed with demo data if the DB is empty or incomplete."""
     try:
         db.create_all()
         from app.models.user import User
-        if User.query.count() == 0:
-            app.logger.info("Empty database detected — running auto-seed.")
-            from database.seed import run_seed
+        from database.seed import run_seed
+        # Run seed if either required account is missing
+        admin_exists = User.query.filter_by(username="admin").first()
+        cashier_exists = User.query.filter_by(username="cashier").first()
+        if not admin_exists or not cashier_exists:
+            app.logger.info("Missing users detected — running seed.")
             run_seed()
-            app.logger.info("Auto-seed complete.")
+            app.logger.info("Seed complete.")
     except Exception as e:
-        app.logger.warning("Auto-seed skipped: %s", e)
+        app.logger.warning("Seed skipped: %s", e)
 
 
 def _auto_backup(app):

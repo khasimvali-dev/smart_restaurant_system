@@ -21,7 +21,7 @@ class AuthService:
         )
         user.set_password(password)
         db.session.add(user)
-        db.session.commit()
+        db.session.flush()
         return user
 
     def change_password(self, user, old_password, new_password):
